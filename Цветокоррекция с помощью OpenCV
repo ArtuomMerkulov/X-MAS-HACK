@@ -1,0 +1,116 @@
+import cv2
+
+# Коррекция цвета для изображения в формате JPG
+def color_correct_image(input_image_path, output_image_path):
+    # Загрузка входного изображения
+    input_image = cv2.imread(input_image_path)
+
+    # Применение двустороннего фильтра к изображению
+    filtered_image = cv2.bilateralFilter(input_image, 5, 25, 25)
+
+    # Преобразование отфильтрованного изображения в цветовое пространство LAB
+    lab_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2LAB)
+
+    # Разделение изображения на каналы L, A и B
+    l_channel, a_channel, b_channel = cv2.split(lab_image)
+
+    # Применение эквализации гистограммы к каналу L
+    clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
+    clahe_l_channel = clahe.apply(l_channel)
+
+    # Объединение каналов L, A и B обратно
+    clahe_lab_image = cv2.merge((clahe_l_channel, a_channel, b_channel))
+
+    # Преобразование улучшенного изображения LAB обратно в цветовое пространство BGR
+    output_image = cv2.cvtColor(clahe_lab_image, cv2.COLOR_LAB2BGR)
+
+    # Сохранение выходного изображения
+    cv2.imwrite(output_image_path, output_image)
+
+    # Отображение выходного изображения
+    #cv2.imshow('Color Corrected Image', output_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Display the original and processed images
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB))
+    plt.title('Original Image')
+    plt.subplot(1, 2, 2)
+    plt.imshow(cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB))
+    plt.title('Processed Image')
+    plt.show()
+
+# Коррекция цвета для видео в формате MP4
+def color_correct_video(input_video_path, output_video_path):
+    # Загрузка входного видео
+    input_video = cv2.VideoCapture(input_video_path)
+
+    # Получение размера видео
+    width = int(input_video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(input_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Определение кодека и создание объекта VideoWriter
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    output_video = cv2.VideoWriter(output_video_path, fourcc, 30.0, (width, height))
+
+    # Цикл по кадрам видео
+    while input_video.isOpened():
+        ret, frame = input_video.read()
+
+        if ret:
+            # Применение двустороннего фильтра к кадру
+            filtered_frame = cv2.bilateralFilter(frame, 5, 25, 25)
+
+            # Преобразование отфильтрованного кадра в цветовое пространство LAB
+            lab_frame = cv2.cvtColor(filtered_frame, cv2.COLOR_BGR2LAB)
+
+            # Разделение кадра на каналы L, A и B
+            l_channel, a_channel, b_channel = cv2.split(lab_frame)
+
+            # Применение эквализации гистограммы к каналу L
+            clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
+            clahe_l_channel = clahe.apply(l_channel)
+
+            # Объединение каналов L, A и B обратно
+            clahe_lab_frame = cv2.merge((clahe_l_channel, a_channel, b_channel))
+
+            # Преобразование улучшенного кадра LAB обратно в цветовое пространство BGR
+            output_frame = cv2.cvtColor(clahe_lab_frame, cv2.COLOR_LAB2BGR)
+
+            # Запись выходного кадра в выходное видео
+            output_video.write(output_frame)
+
+            # Отображение выходного кадра
+            #cv2.imshow('Color Corrected Video', output_frame)
+
+            # Выход из цикла, если пользователь нажимает 'q'
+
+            plt.figure()
+            plt.subplot(1, 2, 1)
+            plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            plt.title('Original Frame')
+            plt.subplot(1, 2, 2)
+            plt.imshow(cv2.cvtColor(output_frame, cv2.COLOR_BGR2RGB))
+            plt.title('Processed Frame')
+            plt.show()
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        else:
+            break
+
+    # Освобождение объектов входного и выходного видео и закрытие окон
+    input_video.release()
+    output_video.release()
+    cv2.destroyAllWindows()
+
+# Основная функция
+if __name__ == "__main__":
+    input_image_path = '/content/sample-birch-400x300.jpg'
+    output_image_path = '/content/output4.jpg'
+    input_video_path = '/content/sample-30s.mp4'
+    output_video_path = '/content/output4.mp4'
+
+    color_correct_image(input_image_path, output_image_path)
+    color_correct_video(input_video_path, output_video_path)
