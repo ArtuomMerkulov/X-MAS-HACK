@@ -29,13 +29,16 @@ def get_parser():
                         help='input video filepath')
     parser.add_argument('--out_dir', type=str, default='.',
                         help='output directory')
+    parser.add_argument('--out_name', type=str, default='',
+                        help='output file name')
     parser.add_argument('--show_output', type=int, default=1,
                         help='show output')
     return parser
 
 args = get_parser().parse_args()
 img_path = args.img_path
-out_dir = args.out_dir 
+out_dir = args.out_dir
+out_name = args.out_name 
 video_path = args.video_path
 # можно установить upgraded_model = 1, чтобы исользовать более новую модель
 upgraded_model = 0
@@ -53,7 +56,10 @@ if img_path != '' and video_path == '':
   start_inf = time.perf_counter()
   I = cv2.imread(img_path)  # считаем изображение
   outImg = wbModel.correctImage(I)  # применим коррекцию
-  cv2.imwrite(out_dir + '/' + 'result.jpg', outImg * 255)  # сохраним результат
+  if out_name == '':
+    cv2.imwrite(out_dir + '/' + 'result.png', outImg * 255)  # сохраним результат
+  else:
+    cv2.imwrite(out_dir + '/' + f'{out_name}', outImg * 255)  # сохраним результат
   print(f"Inference time: {time.perf_counter() - start_inf}")
 
   if show_output == 1:
@@ -74,8 +80,11 @@ elif img_path == '' and video_path != '':
     total_frames = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Определение кодека и создание объекта VideoWriter
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output_video = cv2.VideoWriter(out_dir + '/' + 'result_video.mp4', fourcc, 30, (width, height))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')    
+    if out_name == '':
+      output_video = cv2.VideoWriter(out_dir + '/' + 'result_video.mp4', fourcc, 30, (width, height))
+    else:
+      output_video = cv2.VideoWriter(out_dir + '/' + f'{out_name}', fourcc, 30, (width, height))
 
     # Цикл по кадрам видео
     with tqdm(total=total_frames) as pbar:
@@ -95,3 +104,6 @@ elif img_path == '' and video_path != '':
     input_video.release()
     output_video.release()
     print(f"Inference time: {time.perf_counter() - start_inf}")
+
+else:
+   raise Exception("Pass either path to img or video.")
