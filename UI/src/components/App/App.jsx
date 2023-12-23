@@ -52,40 +52,6 @@ const App = () => {
 
       const imgBefore = URL.createObjectURL(files[0])
 
-      // fetch(imgBefore)
-      //   .then(response => response.blob())
-      //   .then(blob => {
-      //     const meta = {
-      //       "mode": [
-      //         "improve"
-      //       ],
-      //       "images": [
-      //         {
-      //           "name": "blob"
-      //         }
-      //       ]
-      //     }
-      //     const data = new FormData()
-      //     data.append('meta', JSON.stringify(meta))
-      //     data.append('file', blob)          
-      //     const request = {
-      //       method: 'POST',
-      //       mode: "no-cors",
-      //       cache: "no-cache",
-      //       headers: {
-      //         'Accept': 'application/json',
-      //         'Access-Control-Allow-Origin': '*',
-      //         'Access-Control-Allow-Credentials': 'true',
-      //         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
-      //       },
-      //       body: data,
-      //     }
-
-      //     fetch('https://smarty.mail.ru/api/v1/photo/improve?oauth_token=316ZWhuVK77jeXTuZ4BSnrY9XuYGgjvKGKGPBh9DJwFVwmaFq8wf3852EBA7nD&oauth_provider=mcs9230973202.ml.vision.amdtGL4kPdy9p2KpAPxV', request)
-      //       .then(response => response)
-      //       .then(respData => console.log(respData))
-      //   })
-
       fetch(imgBefore)
         .then(response => response.blob())
         .then(blob => {
@@ -96,7 +62,7 @@ const App = () => {
           const request = {
             method: 'POST',
             headers: {
-              'X-API-KEY': 'wx1pbuyfp3uz2dqho',
+              'X-API-KEY': 'wxu89ab6exjvx2w08',
               'Accept': 'application/json',
               'Access-Control-Allow-Origin': '*',
               'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
@@ -128,7 +94,7 @@ const App = () => {
                 Цветники-ИИ
               </Typography>
               <Typography variant="body2" color="text.secondary" component="div" sx={{ pb: 2 }}>
-                Какой-нибудь текст с пояснением как работает улучшение изображений.
+                Web-сервис для цветовой коррекции изображений.
               </Typography>
               <FormControl>
                 <FormLabel>
