@@ -1,116 +1,85 @@
+# ngrok
+
+Для работы с ngrok необходимо пройти процедуру регистрации для получения токена. Выполнити следующие шаги:
+
+1. Перейдите по [ссылке](https://dashboard.ngrok.com/login) и пройдите процедуру регистрации (можно выбрать «*вход с помощью учетной записи Google*»)
+2. После авторизации выберите пункт меню **Your Authtoken**
+3. Скопируйте Ваш персональный токен
+
+
+!pip install --upgrade protobuf
+
+!wget -q https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+
+!unzip -q ngrok-stable-linux-amd64.zip
+
+!./ngrok authtoken 2V9RmRYkzZlKfzcx4XTU90iQ9wb_419CUJymPbfTtrjUTaSB6
+
+def get_link():
+    get_ipython().system_raw('./ngrok http 8501 &')
+    !curl -s http://localhost:4040/api/tunnels | python3 -c \
+    'import sys, json; print("Ссылка для streamlit: " + json.load(sys.stdin)["tunnels"][0]["public_url"])'
+
+get_link()
+
+<a name="getlink"></a>
+В дальнейшем вам пригодится функция `get_link()`, вызвав которую:
+
+!pip -q install streamlit
+
+!pip install opencv-python
+
+!streamlit hello
+
+code = '''
+import streamlit as st
 import cv2
+from PIL import Image
+import numpy as np
 
-# Коррекция цвета для изображения в формате JPG
-def color_correct_image(input_image_path, output_image_path):
-    # Загрузка входного изображения
-    input_image = cv2.imread(input_image_path)
-
-    # Применение двустороннего фильтра к изображению
+# Define the color correction function
+def color_correct_image(input_image):
+    # Apply bilateral filter to the image
     filtered_image = cv2.bilateralFilter(input_image, 5, 25, 25)
 
-    # Преобразование отфильтрованного изображения в цветовое пространство LAB
+    # Convert the filtered image to the LAB color space
     lab_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2LAB)
 
-    # Разделение изображения на каналы L, A и B
+    # Split the LAB image into L, A, and B channels
     l_channel, a_channel, b_channel = cv2.split(lab_image)
 
-    # Применение эквализации гистограммы к каналу L
+    # Apply CLAHE to the L channel
     clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
     clahe_l_channel = clahe.apply(l_channel)
 
-    # Объединение каналов L, A и B обратно
+    # Merge the LAB channels back together
     clahe_lab_image = cv2.merge((clahe_l_channel, a_channel, b_channel))
 
-    # Преобразование улучшенного изображения LAB обратно в цветовое пространство BGR
+    # Convert the enhanced LAB image back to the BGR color space
     output_image = cv2.cvtColor(clahe_lab_image, cv2.COLOR_LAB2BGR)
 
-    # Сохранение выходного изображения
-    cv2.imwrite(output_image_path, output_image)
+    return output_image
 
-    # Отображение выходного изображения
-    #cv2.imshow('Color Corrected Image', output_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+# Create a Streamlit web app
+st.title('Image Color Correction App')
 
-    # Display the original and processed images
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.imshow(cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB))
-    plt.title('Original Image')
-    plt.subplot(1, 2, 2)
-    plt.imshow(cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB))
-    plt.title('Processed Image')
-    plt.show()
+# Allow the user to upload an image
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
 
-# Коррекция цвета для видео в формате MP4
-def color_correct_video(input_video_path, output_video_path):
-    # Загрузка входного видео
-    input_video = cv2.VideoCapture(input_video_path)
+if uploaded_file is not None:
+    # Read the image
+    image = Image.open(uploaded_file)
+    img_array = np.array(image)
 
-    # Получение размера видео
-    width = int(input_video.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(input_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # Perform color correction
+    corrected_image = color_correct_image(img_array)
 
-    # Определение кодека и создание объекта VideoWriter
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output_video = cv2.VideoWriter(output_video_path, fourcc, 30.0, (width, height))
+    # Display the corrected image
+    st.image([image, corrected_image], caption=['Original Image', 'Corrected Image'], width=300)
+'''
+with open('helloworld1.py', 'w') as f:
+    f.write(code)
 
-    # Цикл по кадрам видео
-    while input_video.isOpened():
-        ret, frame = input_video.read()
+get_link()
 
-        if ret:
-            # Применение двустороннего фильтра к кадру
-            filtered_frame = cv2.bilateralFilter(frame, 5, 25, 25)
-
-            # Преобразование отфильтрованного кадра в цветовое пространство LAB
-            lab_frame = cv2.cvtColor(filtered_frame, cv2.COLOR_BGR2LAB)
-
-            # Разделение кадра на каналы L, A и B
-            l_channel, a_channel, b_channel = cv2.split(lab_frame)
-
-            # Применение эквализации гистограммы к каналу L
-            clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
-            clahe_l_channel = clahe.apply(l_channel)
-
-            # Объединение каналов L, A и B обратно
-            clahe_lab_frame = cv2.merge((clahe_l_channel, a_channel, b_channel))
-
-            # Преобразование улучшенного кадра LAB обратно в цветовое пространство BGR
-            output_frame = cv2.cvtColor(clahe_lab_frame, cv2.COLOR_LAB2BGR)
-
-            # Запись выходного кадра в выходное видео
-            output_video.write(output_frame)
-
-            # Отображение выходного кадра
-            #cv2.imshow('Color Corrected Video', output_frame)
-
-            # Выход из цикла, если пользователь нажимает 'q'
-
-            plt.figure()
-            plt.subplot(1, 2, 1)
-            plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            plt.title('Original Frame')
-            plt.subplot(1, 2, 2)
-            plt.imshow(cv2.cvtColor(output_frame, cv2.COLOR_BGR2RGB))
-            plt.title('Processed Frame')
-            plt.show()
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            break
-
-    # Освобождение объектов входного и выходного видео и закрытие окон
-    input_video.release()
-    output_video.release()
-    cv2.destroyAllWindows()
-
-# Основная функция
-if __name__ == "__main__":
-    input_image_path = '/content/sample-birch-400x300.jpg'
-    output_image_path = '/content/output4.jpg'
-    input_video_path = '/content/sample-30s.mp4'
-    output_video_path = '/content/output4.mp4'
-
-    color_correct_image(input_image_path, output_image_path)
-    color_correct_video(input_video_path, output_video_path)
+!streamlit run helloworld1.py
