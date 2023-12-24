@@ -12,7 +12,6 @@ import {
   FormControlLabel,
   FormLabel,
   Grid,
-  IconButton,
   Radio,
   RadioGroup,
   Snackbar,
@@ -20,10 +19,11 @@ import {
 } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import VisuallyHiddenInput from '../VisuallyHiddenInput/VisuallyHiddenInput'
 import beforeAsset from '../../assets/before.jpg'
 import afterAsset from '../../assets/after.jpg'
+import Logo from '../Logo/Logo'
+import Help from '../Help/Help'
 
 const App = () => {
 
@@ -82,23 +82,23 @@ const App = () => {
   }
 
   const runOpenCV = (imgBefore) => {
-    
+
     const leftImage = document.querySelector('[data-testid="left-image"]')
     const tmpImg = new Image()
     const tmpCanvas = document.createElement('canvas')
     const cvsAfter = document.createElement('canvas')
     const ocv = window.cv
-    
+
     leftImage.parentNode.appendChild(tmpImg)
     tmpImg.width = leftImage.width
-    tmpImg.height = leftImage.height      
+    tmpImg.height = leftImage.height
     tmpImg.src = imgBefore
     tmpImg.id = 'tmpImg'
 
     leftImage.parentNode.appendChild(tmpCanvas)
     tmpCanvas.id = 'tmpCanvas'
     tmpCanvas.width = leftImage.width
-    tmpCanvas.height = leftImage.height    
+    tmpCanvas.height = leftImage.height
     const tmpCtx = tmpCanvas.getContext('2d')
     tmpCtx.drawImage(tmpImg, 0, 0)
 
@@ -115,7 +115,7 @@ const App = () => {
     console.log(leftImage.width + ' ' + leftImage.height)
     leftImage.parentNode.removeChild(tmpImg)
     leftImage.parentNode.removeChild(tmpCanvas)
-   
+
     setInProgress(false)
   }
 
@@ -130,7 +130,7 @@ const App = () => {
 
       switch (method) {
         case "x":
-          openAlert("Для работы с методом необходимо запустить локальный Web-сервер. Обратитесь к разработчику")          
+          openAlert("Для работы с методом необходимо запустить локальный Web-сервер. Обратитесь к разработчику")
           break
         case "p":
           picWish(imgBefore)
@@ -180,9 +180,7 @@ const App = () => {
           </Grid>
           <Grid item sx={{ maxWidth: 400 }}>
             <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                Цветники-ИИ
-              </Typography>
+              <Logo />
               <Typography variant="body2" color="text.secondary" component="div" sx={{ pb: 2 }}>
                 Web-сервис для цветовой коррекции изображений.
               </Typography>
@@ -225,9 +223,7 @@ const App = () => {
               </Button>
             </CardActions>
             <CardActions>
-              <IconButton color="primary" size="small" sx={{ ml: 'auto', mr: 2 }}>
-                <QuestionMarkIcon />
-              </IconButton>
+              <Help />
             </CardActions>
           </Grid>
         </Grid>
